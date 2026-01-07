@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SailCode Bridge</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <div>
+          <h1>SailCode Bridge</h1>
+          <p>本地只读桥接服务，用于安全读取本机项目结构与文件。</p>
+        </div>
+        <div class="status" id="healthStatus">检测中…</div>
+      </header>
+
+      <section class="card">
+        <h2>连接信息</h2>
+        <div class="row">
+          <div>
+            <div class="label">Bridge Token</div>
+            <div class="token-row">
+              <input id="tokenInput" type="text" readonly />
+              <button id="copyToken" class="btn">复制</button>
+            </div>
+          </div>
+          <div>
+            <div class="label">Web 入口</div>
+            <div class="hint">在 SailCode-web 中填写 Base URL 与 Token</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>授权目录</h2>
+        <div class="hint">仅允许读取这些目录下的文件。Windows 示例：C:\\Projects\\SailCode</div>
+        <div class="row">
+          <input id="pathInput" type="text" placeholder="输入要授权的目录路径" />
+          <button id="addPath" class="btn primary">添加目录</button>
+        </div>
+        <div id="pathsList" class="list"></div>
+      </section>
+
+      <section class="card">
+        <h2>项目结构预览</h2>
+        <div class="row">
+          <button id="scanProject" class="btn">扫描当前 Active Root</button>
+        </div>
+        <pre id="projectTree" class="tree">等待扫描…</pre>
+      </section>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

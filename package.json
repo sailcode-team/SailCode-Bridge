@@ -1,0 +1,15 @@
+{
+  "name": "sailcode-bridge",
+  "version": "0.2.0",
+  "description": "Lightweight local bridge for SailCode (read-only file access)",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
