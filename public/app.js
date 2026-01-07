@@ -8,6 +8,7 @@ const scanBtn = document.getElementById('scanProject')
 const projectTree = document.getElementById('projectTree')
 
 let config = null
+let scanTimer = null
 
 const setStatus = (text, ok = true) => {
   healthStatus.textContent = text
@@ -70,6 +71,7 @@ const updatePath = async (action, value) => {
   config.allowedPaths = data.allowedPaths
   config.activeProjectRoot = data.activeProjectRoot
   renderPaths()
+  await scanProject()
 }
 
 const scanProject = async () => {
@@ -84,6 +86,13 @@ const scanProject = async () => {
   } catch (err) {
     projectTree.textContent = `扫描失败：${err.message}`
   }
+}
+
+const startAutoScan = () => {
+  if (scanTimer) clearInterval(scanTimer)
+  scanTimer = setInterval(() => {
+    void scanProject()
+  }, 60 * 1000)
 }
 
 copyBaseUrlBtn.addEventListener('click', () => {
@@ -110,6 +119,8 @@ const init = async () => {
     const health = await fetchJson('/health')
     setStatus(health.status === 'ok' ? 'Bridge 在线' : 'Bridge 未就绪', health.status === 'ok')
     await loadBootstrap()
+    await scanProject()
+    startAutoScan()
   } catch (err) {
     setStatus('Bridge 连接失败', false)
     projectTree.textContent = `错误：${err.message}`
