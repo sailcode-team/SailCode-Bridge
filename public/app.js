@@ -1,6 +1,8 @@
 const healthStatus = document.getElementById('healthStatus')
 const tokenInput = document.getElementById('tokenInput')
 const copyTokenBtn = document.getElementById('copyToken')
+const baseUrlInput = document.getElementById('baseUrlInput')
+const copyBaseUrlBtn = document.getElementById('copyBaseUrl')
 const pathInput = document.getElementById('pathInput')
 const addPathBtn = document.getElementById('addPath')
 const pathsList = document.getElementById('pathsList')
@@ -28,6 +30,7 @@ const loadBootstrap = async () => {
   const data = await fetchJson('/bootstrap')
   token = data.token
   tokenInput.value = token
+  baseUrlInput.value = window.location.origin
   config = data.config
   renderPaths()
 }
@@ -95,6 +98,12 @@ copyTokenBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(token)
   copyTokenBtn.textContent = '已复制'
   setTimeout(() => (copyTokenBtn.textContent = '复制'), 1200)
+})
+
+copyBaseUrlBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(window.location.origin)
+  copyBaseUrlBtn.textContent = '已复制'
+  setTimeout(() => (copyBaseUrlBtn.textContent = '复制'), 1200)
 })
 
 addPathBtn.addEventListener('click', async () => {

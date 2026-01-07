@@ -5,6 +5,7 @@ import os from 'node:os'
 import fs from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { randomBytes } from 'node:crypto'
+import { execSync } from 'node:child_process'
 
 const APP_VERSION = '0.2.0'
 const DEFAULT_PORT = 3737
@@ -131,6 +132,15 @@ const scanDirTree = async (rootDir, opts) => {
   return { lines, entriesCount }
 }
 
+const safeExecVersion = (cmd) => {
+  try {
+    const out = execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8' })
+    return { ok: true, version: String(out).trim() }
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) }
+  }
+}
+
 const main = async () => {
   const config = await ensureConfig()
   const port = Number(process.env.BRIDGE_PORT || config.port || DEFAULT_PORT)
@@ -221,12 +231,26 @@ const main = async () => {
   })
 
   app.get('/env', requireToken, (_req, res) => {
+    const node = safeExecVersion('node -v')
+    const npm = safeExecVersion('npm -v')
+    const git = safeExecVersion('git --version')
+    const pnpm = safeExecVersion('pnpm -v')
+
+    const tools = []
+    if (git.ok) tools.push('git')
+    if (pnpm.ok) tools.push('pnpm')
+    if (npm.ok) tools.push('npm')
+    if (node.ok) tools.push('node')
+
     const shell = process.env.SHELL || process.env.ComSpec || undefined
     res.json({
       os: `${process.platform} ${process.arch}`,
       shell,
-      nodeVersion: process.version,
-      tools: ['node'],
+      nodeVersion: node.ok ? node.version : process.version,
+      npmVersion: npm.ok ? npm.version : undefined,
+      gitVersion: git.ok ? git.version : undefined,
+      pnpmVersion: pnpm.ok ? pnpm.version : undefined,
+      tools,
       isLocalConnected: true
     })
   })
