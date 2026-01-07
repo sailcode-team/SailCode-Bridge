@@ -1,6 +1,4 @@
 const healthStatus = document.getElementById('healthStatus')
-const tokenInput = document.getElementById('tokenInput')
-const copyTokenBtn = document.getElementById('copyToken')
 const baseUrlInput = document.getElementById('baseUrlInput')
 const copyBaseUrlBtn = document.getElementById('copyBaseUrl')
 const pathInput = document.getElementById('pathInput')
@@ -9,7 +7,6 @@ const pathsList = document.getElementById('pathsList')
 const scanBtn = document.getElementById('scanProject')
 const projectTree = document.getElementById('projectTree')
 
-let token = ''
 let config = null
 
 const setStatus = (text, ok = true) => {
@@ -28,8 +25,6 @@ const fetchJson = async (url, opts) => {
 
 const loadBootstrap = async () => {
   const data = await fetchJson('/bootstrap')
-  token = data.token
-  tokenInput.value = token
   baseUrlInput.value = window.location.origin
   config = data.config
   renderPaths()
@@ -67,8 +62,7 @@ const updatePath = async (action, value) => {
   const data = await fetchJson('/config/allowed-paths', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'X-Bridge-Token': token
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ action, path: value })
   })
@@ -85,20 +79,12 @@ const scanProject = async () => {
   }
   projectTree.textContent = '扫描中…'
   try {
-    const data = await fetchJson(`/project/scan?path=${encodeURIComponent(config.activeProjectRoot)}`, {
-      headers: { 'X-Bridge-Token': token }
-    })
+    const data = await fetchJson(`/project/scan?path=${encodeURIComponent(config.activeProjectRoot)}`)
     projectTree.textContent = data.fileStructure || '无结果'
   } catch (err) {
     projectTree.textContent = `扫描失败：${err.message}`
   }
 }
-
-copyTokenBtn.addEventListener('click', () => {
-  navigator.clipboard.writeText(token)
-  copyTokenBtn.textContent = '已复制'
-  setTimeout(() => (copyTokenBtn.textContent = '复制'), 1200)
-})
 
 copyBaseUrlBtn.addEventListener('click', () => {
   navigator.clipboard.writeText(window.location.origin)

@@ -170,17 +170,6 @@ const main = async () => {
   app.use(express.json({ limit: '2mb' }))
   app.use(express.static(path.join(process.cwd(), 'public')))
 
-  const requireToken = (req, res, next) => {
-    const token = req.header('x-bridge-token') || ''
-    if (!token || token !== config.token) {
-      return res.status(401).json({
-        code: 'UNAUTHORIZED',
-        message: 'Missing or invalid bridge token'
-      })
-    }
-    return next()
-  }
-
   const isSameOrigin = (origin) => {
     if (!origin) return true
     return origin === `http://localhost:${port}` || origin === `http://127.0.0.1:${port}`
@@ -215,7 +204,6 @@ const main = async () => {
     }
 
     res.json({
-      token: config.token,
       config: {
         allowedPaths: config.allowedPaths,
         activeProjectRoot: config.activeProjectRoot,
@@ -230,7 +218,7 @@ const main = async () => {
     })
   })
 
-  app.get('/env', requireToken, (_req, res) => {
+  app.get('/env', (_req, res) => {
     const node = safeExecVersion('node -v')
     const npm = safeExecVersion('npm -v')
     const git = safeExecVersion('git --version')
@@ -255,7 +243,7 @@ const main = async () => {
     })
   })
 
-  app.get('/project/scan', requireToken, async (req, res) => {
+  app.get('/project/scan', async (req, res) => {
     const pathParam = req.query.path ? String(req.query.path) : config.activeProjectRoot
     const maxDepth = Math.min(Number(req.query.maxDepth || config.maxDepth), 8)
     const maxEntries = Math.min(Number(req.query.maxEntries || config.maxEntries), 1500)
@@ -293,7 +281,7 @@ const main = async () => {
     })
   })
 
-  app.post('/fs/read', requireToken, async (req, res) => {
+  app.post('/fs/read', async (req, res) => {
     const { path: filePath, encoding = 'utf8', maxLines = config.maxReadLines } = req.body || {}
 
     if (!filePath) {
@@ -345,7 +333,7 @@ const main = async () => {
     })
   })
 
-  app.get('/config', requireToken, (_req, res) => {
+  app.get('/config', (_req, res) => {
     res.json({
       allowedPaths: config.allowedPaths,
       activeProjectRoot: config.activeProjectRoot,
@@ -361,7 +349,7 @@ const main = async () => {
     })
   })
 
-  app.post('/config/allowed-paths', requireToken, async (req, res) => {
+  app.post('/config/allowed-paths', async (req, res) => {
     const { action, path: targetPath } = req.body || {}
     if (!targetPath || typeof targetPath !== 'string') {
       return res.status(400).json({ code: 'INVALID_REQUEST', message: 'path is required' })

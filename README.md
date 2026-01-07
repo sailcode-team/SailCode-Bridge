@@ -29,7 +29,7 @@ npm start
 ## 安全模型
 
 - **只读**：不执行命令、不写文件
-- **Token**：所有数据接口必须带 `X-Bridge-Token`
+- **本地限制**：仅允许 localhost 访问（CORS 限制）
 - **目录白名单**：仅允许读取用户授权的目录
 - **扩展名黑名单**：默认拒绝 `.env/.key/.pem/.exe` 等敏感文件
 
@@ -62,8 +62,7 @@ npm start
 
 - `GET /health`
 - `GET /capabilities`
-- `GET /env` (需 token)
-- `GET /project/scan?path=...` (需 token)
-- `POST /fs/read` (需 token)
-- `POST /config/allowed-paths` (需 token)
-
+- `GET /env`
+- `GET /project/scan?path=...`
+- `POST /fs/read`
+- `POST /config/allowed-paths`
